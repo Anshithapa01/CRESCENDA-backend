@@ -32,7 +32,7 @@ public class AppConfig {
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 				CorsConfiguration cfg=new CorsConfiguration();
 				cfg.setAllowedOrigins(Arrays.asList(
-						"http://localhost:5173"
+						"https://anshitha.cloud/"
 						));
 				cfg.setAllowedMethods(Collections.singletonList("*"));
 				cfg.setAllowCredentials(true);
