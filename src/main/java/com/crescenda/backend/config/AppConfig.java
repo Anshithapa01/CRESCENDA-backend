@@ -32,7 +32,8 @@ public class AppConfig {
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 				CorsConfiguration cfg=new CorsConfiguration();
 				cfg.setAllowedOrigins(Arrays.asList(
-						"https://www.anshitha.cloud/"
+						"https://www.anshitha.cloud/",
+						"https://crescenda-frondend-anshithapa01s-projects.vercel.app"
 						));
 				cfg.setAllowedMethods(Collections.singletonList("*"));
 				cfg.setAllowCredentials(true);
