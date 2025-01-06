@@ -14,7 +14,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	
 	@Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("https://crescenda-frondend-16wh2o18k-anshithapa01s-projects.vercel.app");
+        registry.addEndpoint("/ws").setAllowedOrigins("https://www.anshitha.cloud/");
 
     }
 
