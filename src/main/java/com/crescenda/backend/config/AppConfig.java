@@ -32,13 +32,14 @@ public class AppConfig {
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 				CorsConfiguration cfg=new CorsConfiguration();
 				cfg.setAllowedOrigins(Arrays.asList(
-						"https://www.anshitha.cloud/",
-						"https://crescenda-frondend-anshithapa01s-projects.vercel.app"
-						));
-				cfg.setAllowedMethods(Collections.singletonList("*"));
-				cfg.setAllowCredentials(true);
-				cfg.setAllowedHeaders(Collections.singletonList("*"));
-				cfg.setExposedHeaders(Arrays.asList("Authorization"));
+					    "https://www.anshitha.cloud",
+					    "https://anshitha.cloud",
+					    "https://crescenda-frondend-anshithapa01s-projects.vercel.app"
+					));
+					cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+					cfg.setAllowCredentials(true);
+					cfg.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+					cfg.setExposedHeaders(Arrays.asList("Authorization"));
 				cfg.setMaxAge(3600L);
 				return cfg;
 			}
