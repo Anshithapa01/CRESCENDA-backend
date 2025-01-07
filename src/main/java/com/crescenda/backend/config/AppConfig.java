@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,21 +31,23 @@ public class AppConfig {
 	    configuration.setMaxAge(3600L);
 
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", configuration);
+	    source.registerCorsConfiguration("/**", configuration); // Apply CORS to all endpoints
 	    return source;
 	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	    http
-	        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+	        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply global CORS
 	        .csrf().disable()
 	        .authorizeHttpRequests(authorize -> authorize
-	            .requestMatchers("/api/**").authenticated()
-	            .anyRequest().permitAll()
+	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
+	            .requestMatchers("/auth/**", "/**").permitAll()    // No authentication required for these
+	            .requestMatchers("/api/**").authenticated()            // Require authentication for /api/*
+	            .anyRequest().permitAll()                              // Default permit for other endpoints
 	        )
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-	        .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class);
+	        .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class); // JWT validation
 	    return http.build();
 	}
 
