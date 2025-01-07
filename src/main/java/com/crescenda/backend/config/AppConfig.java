@@ -1,9 +1,9 @@
 package com.crescenda.backend.config;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,30 +20,34 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AppConfig {
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-		.authorizeHttpRequests(Authorize->Authorize.requestMatchers("/api/**")
-				.authenticated().anyRequest().permitAll())
-		.addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
-		.csrf().disable()
-		.cors().configurationSource(new CorsConfigurationSource() {
-			
-			@Override
-			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-				CorsConfiguration cfg=new CorsConfiguration();
-				cfg.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud","https://backend.anshitha.cloud"));
-				cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-				cfg.setAllowCredentials(true);
-				cfg.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
-				cfg.setExposedHeaders(Arrays.asList("Authorization"));
-				cfg.setMaxAge(3600L);
-				System.out.println("CORS Configuration: " + cfg.toString());
-				return cfg;
-			}
-		})
-		.and().httpBasic().and().formLogin();
-	return http.build();
+	public CorsConfigurationSource corsConfigurationSource() {
+	    CorsConfiguration configuration = new CorsConfiguration();
+	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud"));
+	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
+	    configuration.setAllowCredentials(true);
+	    configuration.setMaxAge(3600L);
+
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    source.registerCorsConfiguration("/**", configuration);
+	    return source;
 	}
+
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	    http
+	        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+	        .csrf().disable()
+	        .authorizeHttpRequests(authorize -> authorize
+	            .requestMatchers("/api/**").authenticated()
+	            .anyRequest().permitAll()
+	        )
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class);
+	    return http.build();
+	}
+
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
