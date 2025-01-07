@@ -31,12 +31,13 @@ public class AppConfig {
 			@Override
 			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 				CorsConfiguration cfg=new CorsConfiguration();
-				cfg.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud/","https://backend.anshitha.cloud"));
-					cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-					cfg.setAllowCredentials(true);
-					cfg.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
-					cfg.setExposedHeaders(Arrays.asList("Authorization"));
+				cfg.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud","https://backend.anshitha.cloud"));
+				cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+				cfg.setAllowCredentials(true);
+				cfg.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+				cfg.setExposedHeaders(Arrays.asList("Authorization"));
 				cfg.setMaxAge(3600L);
+				System.out.println("CORS Configuration: " + cfg.toString());
 				return cfg;
 			}
 		})
