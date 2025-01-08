@@ -24,9 +24,14 @@ public class AppConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 	    CorsConfiguration configuration = new CorsConfiguration();
-	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud"));
-	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type","Accept", "X-Requested-With"));
+	    configuration.setAllowedOrigins(Arrays.asList("*"));
+	    configuration.setAllowedMethods(Arrays.asList("OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE"));
+	    configuration.setAllowedHeaders(Arrays.asList(
+                "X-Requested-With", "X-Auth-Token", "Content-Type", "Content-Length", 
+                "Authorization", "Access-Control-Allow-Headers", "Accept", 
+                "Access-Control-Allow-Methods", "Access-Control-Allow-Origin", 
+                "Access-Control-Allow-Credentials"
+        ));
 	    configuration.setAllowCredentials(true);
 
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
