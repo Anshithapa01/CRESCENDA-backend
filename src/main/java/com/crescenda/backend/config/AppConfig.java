@@ -25,7 +25,7 @@ public class AppConfig {
 	    CorsConfiguration configuration = new CorsConfiguration();
 	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud"));
 	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type","Accept", "X-Requested-With"));
 	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
 	    configuration.setAllowCredentials(true);
 	    configuration.setMaxAge(3600L);
@@ -42,7 +42,7 @@ public class AppConfig {
 	        .csrf().disable()
 	        .authorizeHttpRequests(authorize -> authorize
 	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
-	            .requestMatchers("/auth/**", "/**").permitAll()    // No authentication required for these
+	            .requestMatchers("/auth/**", "/auth/signin","/mentor").permitAll()    // No authentication required for these
 	            .requestMatchers("/api/**").authenticated()            // Require authentication for /api/*
 	            .anyRequest().permitAll()                              // Default permit for other endpoints
 	        )
