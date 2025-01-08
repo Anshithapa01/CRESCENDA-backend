@@ -2,6 +2,7 @@ package com.crescenda.backend.config;
 
 import java.util.Arrays;
 
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.context.annotation.Configuration;
@@ -26,9 +27,7 @@ public class AppConfig {
 	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud"));
 	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type","Accept", "X-Requested-With"));
-	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
 	    configuration.setAllowCredentials(true);
-	    configuration.setMaxAge(3600L);
 
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	    source.registerCorsConfiguration("/**", configuration); // Apply CORS to all endpoints
@@ -37,12 +36,13 @@ public class AppConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    http
-	        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply global CORS
-	        .csrf().disable()
+		http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(AbstractHttpConfigurer::disable)
 	        .authorizeHttpRequests(authorize -> authorize
 	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
-	            .requestMatchers("/auth/**", "/auth/signin","/mentor").permitAll()    // No authentication required for these
+	            .requestMatchers("/mentor","/auth/signup").permitAll() 
+	            .requestMatchers("/auth/**", "/auth/signin").permitAll()
 	            .requestMatchers("/api/**").authenticated()            // Require authentication for /api/*
 	            .anyRequest().permitAll()                              // Default permit for other endpoints
 	        )
