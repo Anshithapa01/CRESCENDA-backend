@@ -23,19 +23,29 @@ public class AppConfig {
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
-	    CorsConfiguration configuration = new CorsConfiguration();
-	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud"));
-	    configuration.setAllowedMethods(Arrays.asList("OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE"));
-	    configuration.setAllowedHeaders(Arrays.asList(
-                "X-Requested-With", "X-Auth-Token", "Content-Type", "Content-Length", 
-                "Authorization", "Access-Control-Allow-Headers", "Accept", 
-                "Access-Control-Allow-Methods", "Access-Control-Allow-Origin", 
-                "Access-Control-Allow-Credentials"
-        ));
+//	    CorsConfiguration configuration = new CorsConfiguration();
+//	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud"));
+//	    configuration.setAllowedMethods(Arrays.asList("OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE"));
+//	    configuration.setAllowedHeaders(Arrays.asList(
+//                "X-Requested-With", "X-Auth-Token", "Content-Type", "Content-Length", 
+//                "Authorization", "Access-Control-Allow-Headers", "Accept", 
+//                "Access-Control-Allow-Methods", "Access-Control-Allow-Origin", 
+//                "Access-Control-Allow-Credentials"
+//        ));
+//	    configuration.setAllowCredentials(true);
+//
+//	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//	    source.registerCorsConfiguration("/**", configuration); // Apply CORS to all endpoints
+//	    return source;
+		
+		CorsConfiguration configuration = new CorsConfiguration();
 	    configuration.setAllowCredentials(true);
+	    configuration.addAllowedOrigin("https://www.anshitha.cloud");
+	    configuration.addAllowedHeader("*");
+	    configuration.addAllowedMethod("*");
 
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", configuration); // Apply CORS to all endpoints
+	    source.registerCorsConfiguration("/**", configuration);
 	    return source;
 	}
 
