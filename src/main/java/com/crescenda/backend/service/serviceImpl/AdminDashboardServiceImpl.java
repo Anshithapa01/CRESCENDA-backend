@@ -1,4 +1,4 @@
-package com.crescenda.backend.serviceImpl;
+package com.crescenda.backend.service.serviceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,10 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.crescenda.backend.model.Course;
-import com.crescenda.backend.model.Enrollment;
 import com.crescenda.backend.model.MentorPayment;
-import com.crescenda.backend.repository.EnrollmentRepository;
+import com.crescenda.backend.model.Payment;
 import com.crescenda.backend.repository.MentorPaymentRepository;
+import com.crescenda.backend.repository.PaymentRepository;
 import com.crescenda.backend.repository.RatingRepository;
 import com.crescenda.backend.response.PurchaseDetailsResponse;
 import com.crescenda.backend.service.AdminDashboardService;
@@ -26,7 +26,7 @@ import com.crescenda.backend.service.AdminDashboardService;
 public class AdminDashboardServiceImpl implements AdminDashboardService{
 	
 	@Autowired
-	EnrollmentRepository enrollmentRepository;
+	PaymentRepository paymentRepository;
 	@Autowired
 	MentorPaymentRepository mentorPaymentRepository;
 	@Autowired
@@ -36,7 +36,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService{
 	@Override
 	public Map<String, Object> calculateLifetimeMetrics() {
 	    // Lifetime metrics from enrollment and mentor payments
-	    BigDecimal lifetimeTotalEnrollmentAmount = enrollmentRepository.findTotalEnrollmentAmount();
+	    BigDecimal lifetimeTotalEnrollmentAmount = paymentRepository.findTotalPaymentAmount();
 
 	    List<MentorPayment> mentorPayments = mentorPaymentRepository.findAll();
 
@@ -48,9 +48,9 @@ public class AdminDashboardServiceImpl implements AdminDashboardService{
 	        .map(MentorPayment::getCommissionDeducted)
 	        .reduce(BigDecimal.ZERO, BigDecimal::add);
 	    
-	    List<Object[]> weeklyData = enrollmentRepository.findWeeklyAmounts();
-	    List<Object[]> monthlyData = enrollmentRepository.findMonthlyAmounts();
-	    List<Object[]> yearlyData = enrollmentRepository.findYearlyAmounts();
+	    List<Object[]> weeklyData = paymentRepository.findWeeklyAmounts();
+	    List<Object[]> monthlyData = paymentRepository.findMonthlyAmounts();
+	    List<Object[]> yearlyData = paymentRepository.findYearlyAmounts();
 	    
 	    List<Map<String, Object>> formattedMonthlyData = monthlyData.stream()
 	    	    .map(record -> Map.of(
@@ -62,10 +62,10 @@ public class AdminDashboardServiceImpl implements AdminDashboardService{
 	    // Process results into structured data
 	    
 
-	    double todaysAmount = enrollmentRepository.findTodaysAmount();
-	    double thisWeeksAmount = enrollmentRepository.findThisWeeksAmount();
-	    double thisMonthsAmount = enrollmentRepository.findThisMonthsAmount();
-	    double thisYearsAmount =enrollmentRepository.findThisYearsAmount();
+	    double todaysAmount = paymentRepository.findTodaysAmount();
+	    double thisWeeksAmount = paymentRepository.findThisWeeksAmount();
+	    double thisMonthsAmount = paymentRepository.findThisMonthsAmount();
+	    double thisYearsAmount =paymentRepository.findThisYearsAmount();
 	    double thisMonthsCommission = mentorPaymentRepository.findThisMonthsCommissionDeducted();
 
 	    // Rating statistics
@@ -117,7 +117,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService{
 	@Override
 	public List<Map<String, Object>> getTopSellingCourses() {
 	    Pageable topTen = PageRequest.of(0, 10); // Fetch top 10
-	    List<Object[]> results = enrollmentRepository.findTopSellingCourses(topTen);
+	    List<Object[]> results = paymentRepository.findTopSellingCourses(topTen);
 
 	    // Convert results to a readable format
 	    List<Map<String, Object>> topCourses = new ArrayList<>();
@@ -146,7 +146,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService{
 	@Override
 	public List<PurchaseDetailsResponse> getAllPurchases() {
         // Fetch all enrollments
-        List<Enrollment> enrollments = enrollmentRepository.findAll();
+        List<Payment> enrollments = paymentRepository.findAll();
 
         // Map enrollments to response class
         return enrollments.stream()
@@ -155,14 +155,14 @@ public class AdminDashboardServiceImpl implements AdminDashboardService{
                         enrollment.getCourse().getDraft().getThumbnailUrl(),
                         enrollment.getCourse().getDraft().getCourseName(),
                         enrollment.getStudent().getFirstName(),
-                        enrollment.getEnrollmentDate(),
+                        enrollment.getPaymentDate(),
                         enrollment.getAmount()))
                 .collect(Collectors.toList());
     }
 	
 	@Override
 	public List<Map<String, Object>> getDailyTotals(LocalDateTime fromDate, LocalDateTime toDate) {
-	    List<Object[]> dailyData = enrollmentRepository.findDailyTotalsByDateRange(fromDate, toDate);
+	    List<Object[]> dailyData = paymentRepository.findDailyTotalsByDateRange(fromDate, toDate);
 
 	    // Map results into a readable format
 	    return dailyData.stream()

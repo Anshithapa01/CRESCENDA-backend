@@ -79,7 +79,7 @@ public class Student {
 
     @OneToMany(mappedBy = "student")
     @JsonManagedReference("student-enrollment")
-    private List<Enrollment> enrollments;
+    private List<Payment> enrollments;
 
     @OneToMany(mappedBy = "student")
     @JsonManagedReference("student-attempts")

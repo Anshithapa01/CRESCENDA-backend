@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.crescenda.backend.response.PurchaseDetailsResponse;
 import com.crescenda.backend.service.MentorDashboardService;
-import com.crescenda.backend.serviceImpl.MentorDashboardServiceImpl.DailyEarningsResponse;
+import com.crescenda.backend.service.serviceImpl.MentorDashboardServiceImpl.DailyEarningsResponse;
 
 
 @RestController

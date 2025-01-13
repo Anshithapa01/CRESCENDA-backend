@@ -1,4 +1,4 @@
-package com.crescenda.backend.serviceImpl;
+package com.crescenda.backend.service.serviceImpl;
 
 
 import com.crescenda.backend.model.Chapter;

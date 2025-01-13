@@ -1,4 +1,4 @@
-package com.crescenda.backend.serviceImpl;
+package com.crescenda.backend.service.serviceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Service;
 
 import com.crescenda.backend.model.Course;
 import com.crescenda.backend.model.Draft;
-import com.crescenda.backend.model.Enrollment;
 import com.crescenda.backend.model.Mentor;
 import com.crescenda.backend.model.MentorPayment;
+import com.crescenda.backend.model.Payment;
 import com.crescenda.backend.model.Student;
 import com.crescenda.backend.model.SubCategory;
 import com.crescenda.backend.repository.CourseRepository;
-import com.crescenda.backend.repository.EnrollmentRepository;
 import com.crescenda.backend.repository.MentorPaymentRepository;
+import com.crescenda.backend.repository.PaymentRepository;
 import com.crescenda.backend.repository.StudentRepository;
 import com.crescenda.backend.response.CourseResponse;
 import com.crescenda.backend.response.DraftResponse;
@@ -35,7 +35,7 @@ import com.crescenda.backend.service.StudentService;
 public class EnrollmentServiceImpl implements EnrollmentService{
 
 	@Autowired
-    private EnrollmentRepository enrollmentRepository;
+    private PaymentRepository paymentRepository;
 	@Autowired
 	private StudentService studentService;
 	@Autowired
@@ -48,7 +48,7 @@ public class EnrollmentServiceImpl implements EnrollmentService{
 
     @Override
     public List<PurchasedCourseResponse> getPurchasedCoursesByStudentId(int studentId) {
-        List<Enrollment> enrollments = enrollmentRepository.findByStudentStudentId(studentId);
+        List<Payment> enrollments = paymentRepository.findByStudentStudentId(studentId);
         
         return enrollments.stream()
                 .map(enrollment -> {
@@ -56,8 +56,8 @@ public class EnrollmentServiceImpl implements EnrollmentService{
                     StudentResponse studentResponse=studentService.mapToStudentResponse(enrollment.getStudent());
                     
                     return new PurchasedCourseResponse(
-                            enrollment.getEnrollmentId(),
-                            enrollment.getEnrollmentDate(),
+                            enrollment.getId(),
+                            enrollment.getPaymentDate(),
                             enrollment.getAmount(),
                             enrollment.getPaymentStatus(),
                             enrollment.getPaymentId(),
@@ -70,7 +70,7 @@ public class EnrollmentServiceImpl implements EnrollmentService{
     
     @Override
     public boolean isStudentEnrolled(int courseId, int studentId) {
-        return enrollmentRepository.existsByCourseCourseIdAndStudentStudentId(courseId, studentId);
+        return paymentRepository.existsByCourseCourseIdAndStudentStudentId(courseId, studentId);
     }
     
     @Override
@@ -80,14 +80,13 @@ public class EnrollmentServiceImpl implements EnrollmentService{
 
         if (isPaymentVerified) {
             // Step 2: Check if an enrollment already exists
-            Enrollment existingEnrollment = enrollmentRepository.findByPaymentId(razorpayOrderId);
+            Payment existingEnrollment = paymentRepository.findByPaymentId(razorpayOrderId);
 
             if (existingEnrollment == null) {
                 // Step 3: Create a new enrollment record if it doesn't exist
-                Enrollment newEnrollment = new Enrollment();
+                Payment newEnrollment = new Payment();
                 newEnrollment.setPaymentId(razorpayOrderId);
                 newEnrollment.setPaymentStatus("Completed");
-                newEnrollment.setPurchaseConfirmation("Confirmed");
                 newEnrollment.setAmount(amount);
 
                 // Fetch student and course entities
@@ -100,13 +99,12 @@ public class EnrollmentServiceImpl implements EnrollmentService{
                 newEnrollment.setCourse(course);
 
                 // Save the new enrollment
-                enrollmentRepository.save(newEnrollment);
+                paymentRepository.save(newEnrollment);
                 updateMentorPayment(course.getDraft().getMentor(), amount);
             } else {
                 // Update existing enrollment if found
                 existingEnrollment.setPaymentStatus("Completed");
-                existingEnrollment.setPurchaseConfirmation("Confirmed");
-                enrollmentRepository.save(existingEnrollment);
+                paymentRepository.save(existingEnrollment);
             }
             return true;
         }

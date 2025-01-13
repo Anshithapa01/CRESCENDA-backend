@@ -63,7 +63,7 @@ public class Course {
 	    private List<Rating> ratings;
 		
 		@OneToMany(mappedBy = "course")
-	    private List<Enrollment> enrollments;
+	    private List<Payment> enrollments;
 		
 		@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
 	    private List<MentorStudent> mentorStudents;

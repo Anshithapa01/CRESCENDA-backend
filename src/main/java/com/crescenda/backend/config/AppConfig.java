@@ -1,6 +1,7 @@
 package com.crescenda.backend.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -23,30 +24,17 @@ public class AppConfig {
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
-//	    CorsConfiguration configuration = new CorsConfiguration();
-//	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud"));
-//	    configuration.setAllowedMethods(Arrays.asList("OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE"));
-//	    configuration.setAllowedHeaders(Arrays.asList(
-//                "X-Requested-With", "X-Auth-Token", "Content-Type", "Content-Length", 
-//                "Authorization", "Access-Control-Allow-Headers", "Accept", 
-//                "Access-Control-Allow-Methods", "Access-Control-Allow-Origin", 
-//                "Access-Control-Allow-Credentials"
-//        ));
-//	    configuration.setAllowCredentials(true);
-//
-//	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//	    source.registerCorsConfiguration("/**", configuration); // Apply CORS to all endpoints
-//	    return source;
-		
-		CorsConfiguration configuration = new CorsConfiguration();
+	    CorsConfiguration configuration = new CorsConfiguration();
+	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud","https://anshitha.cloud"));
+	    configuration.setAllowedMethods(Collections.singletonList("*"));
+	    configuration.setAllowedHeaders(Collections.singletonList("*"));
+	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
+	    configuration.setMaxAge(3600L);
 	    configuration.setAllowCredentials(true);
-	    configuration.addAllowedOrigin("https://www.anshitha.cloud");
-	    configuration.addAllowedHeader("*");
-	    configuration.addAllowedMethod("*");
 
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", configuration);
-	    return source;
+	    source.registerCorsConfiguration("/**", configuration); // Apply CORS to all endpoints
+	    return source;	
 	}
 
 	@Bean
@@ -55,7 +43,7 @@ public class AppConfig {
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(AbstractHttpConfigurer::disable)
 	        .authorizeHttpRequests(authorize -> authorize
-	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
+	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
 	            .requestMatchers("/mentor","/auth/signup").permitAll() 
 	            .requestMatchers("/auth/**", "/auth/signin").permitAll()
 	            .requestMatchers("/api/**").authenticated()            // Require authentication for /api/*

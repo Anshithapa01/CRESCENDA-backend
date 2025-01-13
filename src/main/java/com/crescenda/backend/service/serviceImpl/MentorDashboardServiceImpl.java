@@ -1,4 +1,4 @@
-package com.crescenda.backend.serviceImpl;
+package com.crescenda.backend.service.serviceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,25 +8,25 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.crescenda.backend.model.Enrollment;
 import com.crescenda.backend.model.MentorPayment;
+import com.crescenda.backend.model.Payment;
 import com.crescenda.backend.repository.CourseRepository;
-import com.crescenda.backend.repository.EnrollmentRepository;
 import com.crescenda.backend.repository.MentorPaymentRepository;
+import com.crescenda.backend.repository.PaymentRepository;
 import com.crescenda.backend.response.PurchaseDetailsResponse;
 import com.crescenda.backend.service.MentorDashboardService;
 
 @Service
 public class MentorDashboardServiceImpl implements MentorDashboardService{
 	
-	private final EnrollmentRepository enrollmentRepository;
+	private final PaymentRepository paymentRepository;
     private final CourseRepository courseRepository;
     private final MentorPaymentRepository mentorPaymentRepository;
 
-    public MentorDashboardServiceImpl(EnrollmentRepository enrollmentRepository,
+    public MentorDashboardServiceImpl(PaymentRepository paymentRepository,
     		CourseRepository courseRepository,
     		MentorPaymentRepository mentorPaymentRepository) {
-        this.enrollmentRepository = enrollmentRepository;
+        this.paymentRepository = paymentRepository;
         this.courseRepository = courseRepository;
         this.mentorPaymentRepository=mentorPaymentRepository;
     }
@@ -47,7 +47,7 @@ public class MentorDashboardServiceImpl implements MentorDashboardService{
 
     @Override
     public long getTotalPurchases(Long mentorId) {
-        return enrollmentRepository.getMentorTotalPurchases(mentorId);
+        return paymentRepository.getMentorTotalPurchases(mentorId);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class MentorDashboardServiceImpl implements MentorDashboardService{
 
     @Override
     public List<PurchaseDetailsResponse> getPurchaseDetailsByMentorId(Long mentorId) {
-        List<Enrollment> enrollments = enrollmentRepository.findAll();
+        List<Payment> enrollments = paymentRepository.findAll();
 
         // Filter enrollments where the course's draft is associated with the mentor
         return enrollments.stream()
@@ -67,7 +67,7 @@ public class MentorDashboardServiceImpl implements MentorDashboardService{
                         enrollment.getCourse().getDraft().getThumbnailUrl(),
                         enrollment.getCourse().getDraft().getCourseName(),
                         enrollment.getStudent().getFirstName(),
-                        enrollment.getEnrollmentDate(),
+                        enrollment.getPaymentDate(),
                         enrollment.getAmount()
                 ))
                 .collect(Collectors.toList());
@@ -75,7 +75,7 @@ public class MentorDashboardServiceImpl implements MentorDashboardService{
     
     @Override
     public List<DailyEarningsResponse> getDailyEarnings(Long mentorId, LocalDateTime fromDate, LocalDateTime toDate) {
-        List<Object[]> results = enrollmentRepository.findDailyEarningsByMentorId(mentorId, fromDate, toDate);
+        List<Object[]> results = paymentRepository.findDailyEarningsByMentorId(mentorId, fromDate, toDate);
 
         // Map results into a response format
         return results.stream()

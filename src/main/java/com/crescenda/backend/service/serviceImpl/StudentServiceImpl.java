@@ -1,4 +1,4 @@
-package com.crescenda.backend.serviceImpl;
+package com.crescenda.backend.service.serviceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -164,7 +164,7 @@ public class StudentServiceImpl implements StudentService{
 		@Override
 		public void setBlockedStatus(Long id, boolean isBlocked) {
 	        Student student = studentRepository.findById(id).orElseThrow(() -> 
-	            new ResourceNotFoundException("QA not found with id: " + id));
+	            new ResourceNotFoundException("Student not found with id: " + id));
 	        student.setBlocked(isBlocked);
 	        studentRepository.save(student);
 	    }
@@ -174,12 +174,15 @@ public class StudentServiceImpl implements StudentService{
 	        if (student == null) {
 	            throw new UserException("No account found with this email address.");
 	        }
+	        if (student.isBlocked()) {
+	            throw new UserException("User is blocked. Please contact support.");
+	        }
 	        String token = UUID.randomUUID().toString();
 	        student.setResetPasswordToken(token);
 	        studentRepository.save(student);
 
 	        // Send the reset link via email
-	        String resetLink = "http://localhost:5173/reset-password?token=" + token;
+	        String resetLink = "https://www.anshitha.cloud/reset-password?token=" + token;
 	        sendEmail(email, "Password Reset Request", 
 	            "Click the link to reset your password: " + resetLink);
 	    }

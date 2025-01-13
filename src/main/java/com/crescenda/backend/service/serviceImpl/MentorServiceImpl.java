@@ -1,4 +1,4 @@
-package com.crescenda.backend.serviceImpl;
+package com.crescenda.backend.service.serviceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -224,12 +224,15 @@ public class MentorServiceImpl implements MentorService{
         if (mentor == null) {
             throw new UserException("No account found with this email address.");
         }
+        if (mentor.getIsBlocked()==true) {
+            throw new UserException("User is blocked. Please contact support.");
+        }
         String token = UUID.randomUUID().toString();
         mentor.setResetPasswordToken(token);
         mentorRepository.save(mentor);
 
         // Send the reset link via email
-        String resetLink = "http://localhost:5173/mentor/reset-password?token=" + token;
+        String resetLink = "https://www.anshitha.cloud/mentor/reset-password?token=" + token;
         sendEmail(email, "Password Reset Request", 
             "Click the link to reset your password: " + resetLink);
     }

@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PurchasedCourseResponse {
 	
-	private int enrollmentId;
+	private Long enrollmentId;
     private LocalDateTime enrollmentDate;
     private double amount;
     private String paymentStatus;
