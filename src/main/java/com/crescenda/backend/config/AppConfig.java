@@ -26,6 +26,7 @@ public class AppConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 	    CorsConfiguration configuration = new CorsConfiguration();
 	    configuration.setAllowedOrigins(Arrays.asList("https://www.anshitha.cloud","https://anshitha.cloud",
+	    		"http://localhost:5173",
 	    		"http://crescenda.s3-website.ap-south-1.amazonaws.com"
 	    		));
 	    configuration.setAllowedMethods(Collections.singletonList("*"));
