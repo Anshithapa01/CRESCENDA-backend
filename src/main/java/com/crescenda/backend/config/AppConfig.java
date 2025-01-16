@@ -26,23 +26,23 @@ public class AppConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 	    CorsConfiguration configuration = new CorsConfiguration();
 
-	    // Add unique origins
-	    configuration.setAllowedOrigins(Arrays.asList(
-	        "https://www.anshitha.cloud",
-	        "https://anshitha.cloud",
+	    // Use allowedOriginPatterns for dynamic origin matching
+	    configuration.setAllowedOriginPatterns(Arrays.asList(
+	        "https://*.anshitha.cloud",
 	        "http://localhost:5173",
 	        "http://crescenda.s3-website.ap-south-1.amazonaws.com"
 	    ));
 	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
 	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
-	    configuration.setAllowCredentials(true); // Required for cookies/authentication headers
+	    configuration.setAllowCredentials(true);
 	    configuration.setMaxAge(3600L);
 
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	    source.registerCorsConfiguration("/**", configuration);
 	    return source;
 	}
+
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
