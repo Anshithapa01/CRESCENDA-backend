@@ -33,7 +33,6 @@ public class AppConfig {
 	    configuration.setAllowedHeaders(Collections.singletonList("*"));
 	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
 	    configuration.setMaxAge(3600L);
-	    configuration.setAllowCredentials(true);
 
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	    source.registerCorsConfiguration("/**", configuration); // Apply CORS to all endpoints
