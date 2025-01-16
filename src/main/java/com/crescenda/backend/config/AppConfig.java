@@ -27,11 +27,7 @@ public class AppConfig {
 	    CorsConfiguration configuration = new CorsConfiguration();
 
 	    // Use allowedOriginPatterns for dynamic origin matching
-	    configuration.setAllowedOriginPatterns(Arrays.asList(
-	        "https://*.anshitha.cloud",
-	        "http://localhost:5173",
-	        "http://crescenda.s3-website.ap-south-1.amazonaws.com"
-	    ));
+	    configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
 	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
 	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
@@ -47,7 +43,7 @@ public class AppConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+		.cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
 	        .authorizeHttpRequests(authorize -> authorize
 	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
