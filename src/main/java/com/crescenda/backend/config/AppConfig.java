@@ -22,27 +22,27 @@ import jakarta.servlet.http.HttpServletRequest;
 @Configuration
 public class AppConfig {
 
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
-	    CorsConfiguration configuration = new CorsConfiguration();
-
-	    // Use allowedOriginPatterns for dynamic origin matching
-	    configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
-	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
-	    configuration.setAllowCredentials(true);
-	    configuration.setMaxAge(3600L);
-
-	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", configuration);
-	    return source;
-	}
-
+//	@Bean
+//	public CorsConfigurationSource corsConfigurationSource() {
+//	    CorsConfiguration configuration = new CorsConfiguration();
+//
+//	    // Use allowedOriginPatterns for dynamic origin matching
+//	    configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
+//	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+//	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
+//	    configuration.setAllowCredentials(true);
+//	    configuration.setMaxAge(3600L);
+//
+//	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//	    source.registerCorsConfiguration("/**", configuration);
+//	    return source;
+//	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
+//		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 		.cors(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
 	        .authorizeHttpRequests(authorize -> authorize
