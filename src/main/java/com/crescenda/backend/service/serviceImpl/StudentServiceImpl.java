@@ -2,32 +2,36 @@ package com.crescenda.backend.service.serviceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.crescenda.backend.config.JwtProvider;
 import com.crescenda.backend.exception.ResourceNotFoundException;
 import com.crescenda.backend.exception.UserException;
-import com.crescenda.backend.model.QA;
 import com.crescenda.backend.model.Sessions;
 import com.crescenda.backend.model.Student;
 import com.crescenda.backend.repository.SessionRepository;
 import com.crescenda.backend.repository.StudentRepository;
-import com.crescenda.backend.response.QAResponse;
+import com.crescenda.backend.response.AuthResponse;
 import com.crescenda.backend.response.StudentResponse;
 import com.crescenda.backend.service.StudentService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
 @Service
 public class StudentServiceImpl implements StudentService{
@@ -128,6 +132,8 @@ public class StudentServiceImpl implements StudentService{
         sessionRepository.save(newSession); 
 	}
 	
+	
+	
 	@Override
 	 public StudentResponse getStudentById(long id) {
 	        Optional<Student> studentOptional = studentRepository.findById(id);
@@ -210,6 +216,85 @@ public class StudentServiceImpl implements StudentService{
 	        student.setPassword(passwordEncoder.encode(newPassword)); 
 	        student.setResetPasswordToken(null); // Clear the token
 	        studentRepository.save(student);
+	    }
+	    
+	    
+	    
+	    @Override
+	    public Student verifyGoogleAccessToken(String accessToken) throws UserException {
+	        try {
+	            // Use Google's modern libraries for ID token verification
+	            JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+	            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+	                    GoogleNetHttpTransport.newTrustedTransport(), jsonFactory)
+	                    .setAudience(Collections.singletonList("866856697952-guoojs919a9ue3aqcl9qi1fmdqm1ka4b.apps.googleusercontent.com"))
+	                    .build();
+
+	            // Parse and verify the ID token
+	            GoogleIdToken idToken = verifier.verify(accessToken);
+	            if (idToken == null) {
+	                throw new UserException("Invalid Google ID token");
+	            }
+
+	            // Extract user information
+	            GoogleIdToken.Payload payload = idToken.getPayload();
+	            String email = payload.getEmail();
+	            boolean emailVerified = Boolean.TRUE.equals(payload.getEmailVerified());
+
+	            if (!emailVerified) {
+	                throw new UserException("Google email is not verified");
+	            }
+
+	            // Fetch or create user in the database
+	            Student student = studentRepository.findByEmailId(email);
+	            if (student == null) {
+	                throw new UserException("User not found. Please sign up first.");
+	            }
+
+	            return student;
+	        } catch (Exception e) {
+	            throw new UserException("Failed to verify Google access token: " + e.getMessage());
+	        }
+	    }
+
+	    @Override
+	    public AuthResponse signupWithGoogle(String idToken) throws Exception {
+	        // Verify Google ID token
+	        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+	                GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance())
+	                .setAudience(Collections.singletonList("YOUR_CLIENT_ID")) // Replace with your Google Client ID
+	                .build();
+
+	        GoogleIdToken googleIdToken = verifier.verify(idToken);
+	        if (googleIdToken == null) {
+	            throw new UserException("Invalid Google ID token");
+	        }
+
+	        // Extract user information
+	        GoogleIdToken.Payload payload = googleIdToken.getPayload();
+	        String email = payload.getEmail();
+	        boolean emailVerified = Boolean.TRUE.equals(payload.getEmailVerified());
+	        String firstName = (String) payload.get("given_name");
+	        String lastName = (String) payload.get("family_name");
+
+	        if (!emailVerified) {
+	            throw new UserException("Google email not verified");
+	        }
+
+	        // Check if the user already exists
+	        if (studentRepository.findByEmailId(email) != null) {
+	            throw new UserException("User already exists. Please log in.");
+	        }
+
+	        // Create and save the new student
+	        Student newStudent = new Student();
+	        newStudent.setEmailId(email);
+	        newStudent.setFirstName(firstName);
+	        newStudent.setLastName(lastName);
+	        newStudent.setPassword(passwordEncoder.encode("DEFAULT_PASSWORD")); // Default password for OAuth users
+	        studentRepository.save(newStudent);
+
+	        return new AuthResponse(null, "Signup successful");
 	    }
 
 

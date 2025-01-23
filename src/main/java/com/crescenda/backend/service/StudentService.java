@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 
 import com.crescenda.backend.exception.UserException;
 import com.crescenda.backend.model.Student;
+import com.crescenda.backend.response.AuthResponse;
 import com.crescenda.backend.response.StudentResponse;
 
 public interface StudentService {
@@ -33,6 +34,10 @@ public interface StudentService {
 	void resetPassword(String token, String newPassword) throws UserException;
 
 	void createSession(String username, String token);
+
+	Student verifyGoogleAccessToken(String accessToken) throws UserException;
+
+	AuthResponse signupWithGoogle(String idToken) throws Exception;
 
 	
 	
