@@ -5,9 +5,11 @@ import com.crescenda.backend.model.QA;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class QARequest {
     
     private String firstName;

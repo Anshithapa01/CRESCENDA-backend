@@ -103,6 +103,7 @@ public class QaServiceImpl implements QaService{
 	        newQA.setAreasOfExpertise(qaRequest.getAreasOfExpertise());
 	        
 	        if (qaRequest.getLead() != null && qaRequest.getLead().getQaId() != null) {
+	        	System.out.println("lead "+qaRequest.getLead().toString());
 	            QA lead = qaRepository.findById(qaRequest.getLead().getQaId())
 	                    .orElseThrow(() -> new ResourceNotFoundException("Lead not found"));
 	            newQA.setLead(lead);
