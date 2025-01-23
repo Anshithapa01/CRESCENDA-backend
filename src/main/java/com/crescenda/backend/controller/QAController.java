@@ -33,7 +33,7 @@ public class QAController {
     
     @PostMapping
     public ResponseEntity<QAResponse> addQA(@RequestBody QARequest qaRequest) throws UserException {
-    	System.out.println("qarequest.toString()"+qaRequest.toString());
+    	System.out.println("qarequest.toString() print "+qaRequest.toString());
         QA savedQA = qaService.saveQA(qaRequest);
         System.out.println("savedQA.toString()"+savedQA.toString());
         return ResponseEntity.ok(qaService.convertToResponse(savedQA));

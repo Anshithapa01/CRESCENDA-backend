@@ -101,7 +101,7 @@ public class QaServiceImpl implements QaService{
 	        newQA.setQualification(qaRequest.getQualification());
 	        newQA.setExperience(qaRequest.getExperience());
 	        newQA.setAreasOfExpertise(qaRequest.getAreasOfExpertise());
-	        
+	        System.out.println("check lead ");
 	        if (qaRequest.getLead() != null && qaRequest.getLead().getQaId() != null) {
 	        	System.out.println("lead "+qaRequest.getLead().toString());
 	            QA lead = qaRepository.findById(qaRequest.getLead().getQaId())
