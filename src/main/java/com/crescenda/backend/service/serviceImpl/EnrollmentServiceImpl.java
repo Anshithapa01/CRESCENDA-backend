@@ -2,6 +2,7 @@ package com.crescenda.backend.service.serviceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,11 +17,13 @@ import com.crescenda.backend.model.Course;
 import com.crescenda.backend.model.Draft;
 import com.crescenda.backend.model.Mentor;
 import com.crescenda.backend.model.MentorPayment;
+import com.crescenda.backend.model.MentorStudent;
 import com.crescenda.backend.model.Payment;
 import com.crescenda.backend.model.Student;
 import com.crescenda.backend.model.SubCategory;
 import com.crescenda.backend.repository.CourseRepository;
 import com.crescenda.backend.repository.MentorPaymentRepository;
+import com.crescenda.backend.repository.MentorStudentRepository;
 import com.crescenda.backend.repository.PaymentRepository;
 import com.crescenda.backend.repository.StudentRepository;
 import com.crescenda.backend.response.CourseResponse;
@@ -44,6 +47,8 @@ public class EnrollmentServiceImpl implements EnrollmentService{
 	CourseRepository courseRepository;
 	@Autowired
 	MentorPaymentRepository mentorPaymentRepository;
+	@Autowired
+	MentorStudentRepository mentorStudentRepository;
 	
 
     @Override
@@ -100,7 +105,17 @@ public class EnrollmentServiceImpl implements EnrollmentService{
 
                 // Save the new enrollment
                 paymentRepository.save(newEnrollment);
-                updateMentorPayment(course.getDraft().getMentor(), amount);
+                Mentor mentor = course.getDraft().getMentor();
+                updateMentorPayment(mentor, amount);
+
+                // Add new entry to mentor_student table
+                MentorStudent mentorStudent = new MentorStudent();
+                mentorStudent.setStudent(student);
+                mentorStudent.setCourse(course);
+                mentorStudent.setMentor(mentor);
+                mentorStudent.setCreatedAt(LocalDateTime.now());
+
+                mentorStudentRepository.save(mentorStudent);
             } else {
                 // Update existing enrollment if found
                 existingEnrollment.setPaymentStatus("Completed");
