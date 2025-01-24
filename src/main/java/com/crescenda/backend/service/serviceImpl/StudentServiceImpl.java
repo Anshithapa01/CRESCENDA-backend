@@ -188,7 +188,7 @@ public class StudentServiceImpl implements StudentService{
 	        studentRepository.save(student);
 
 	        // Send the reset link via email
-	        String resetLink = "https://www.anshitha.cloud/reset-password?token=" + token;
+	        String resetLink = "https://anshitha.cloud/reset-password?token=" + token;
 	        sendEmail(email, "Password Reset Request", 
 	            "Click the link to reset your password: " + resetLink);
 	    }
