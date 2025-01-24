@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.crescenda.backend.model.Course;
 import com.crescenda.backend.model.Draft;
+import com.crescenda.backend.model.Enrollment;
 import com.crescenda.backend.model.Mentor;
 import com.crescenda.backend.model.MentorPayment;
 import com.crescenda.backend.model.MentorStudent;
@@ -22,6 +23,7 @@ import com.crescenda.backend.model.Payment;
 import com.crescenda.backend.model.Student;
 import com.crescenda.backend.model.SubCategory;
 import com.crescenda.backend.repository.CourseRepository;
+import com.crescenda.backend.repository.EnrollmentRepository;
 import com.crescenda.backend.repository.MentorPaymentRepository;
 import com.crescenda.backend.repository.MentorStudentRepository;
 import com.crescenda.backend.repository.PaymentRepository;
@@ -49,7 +51,8 @@ public class EnrollmentServiceImpl implements EnrollmentService{
 	MentorPaymentRepository mentorPaymentRepository;
 	@Autowired
 	MentorStudentRepository mentorStudentRepository;
-	
+	@Autowired
+	EnrollmentRepository enrollmentRepository;
 
     @Override
     public List<PurchasedCourseResponse> getPurchasedCoursesByStudentId(int studentId) {
@@ -80,31 +83,44 @@ public class EnrollmentServiceImpl implements EnrollmentService{
     
     @Override
     public boolean verifyPayment(String razorpayOrderId, String razorpayPaymentId, String razorpaySignature, int courseId, int studentId, double amount) {
-        // Step 1: Verify Razorpay signature
+        // Step 1: Create a new payment record
+        Payment payment = new Payment();
+        payment.setPaymentId(razorpayOrderId);
+        payment.setAmount(amount);
+        payment.setPaymentStatus("Failed"); // Default to "Failed" initially
+
+        // Fetch student and course entities
+        Student student = studentRepository.findByStudentId(studentId)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid student ID: " + studentId));
+        Course course = courseRepository.findByCourseId(courseId)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid course ID: " + courseId));
+
+        payment.setStudent(student);
+        payment.setCourse(course);
+
+        // Save the payment record
+        payment = paymentRepository.save(payment);
+
+        // Step 2: Verify Razorpay signature
         boolean isPaymentVerified = verifyRazorpaySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
 
         if (isPaymentVerified) {
-            // Step 2: Check if an enrollment already exists
-            Payment existingEnrollment = paymentRepository.findByPaymentId(razorpayOrderId);
+            // Step 3: Update payment status to "Completed" if verification succeeds
+            payment.setPaymentStatus("Completed");
+            paymentRepository.save(payment);
+
+            // Step 4: Check if an enrollment already exists for this payment
+            Enrollment existingEnrollment = enrollmentRepository.findByPayment(payment);
 
             if (existingEnrollment == null) {
-                // Step 3: Create a new enrollment record if it doesn't exist
-                Payment newEnrollment = new Payment();
-                newEnrollment.setPaymentId(razorpayOrderId);
-                newEnrollment.setPaymentStatus("Completed");
-                newEnrollment.setAmount(amount);
+                // Create a new enrollment record if none exists
+                Enrollment enrollment = new Enrollment();
+                enrollment.setPayment(payment);
 
-                // Fetch student and course entities
-                Student student = studentRepository.findByStudentId(studentId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid student ID: " + studentId));
-                Course course = courseRepository.findByCourseId(courseId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid course ID: " + courseId));
+                // Save the enrollment record
+                enrollmentRepository.save(enrollment);
 
-                newEnrollment.setStudent(student);
-                newEnrollment.setCourse(course);
-
-                // Save the new enrollment
-                paymentRepository.save(newEnrollment);
+                // Update mentor payment
                 Mentor mentor = course.getDraft().getMentor();
                 updateMentorPayment(mentor, amount);
 
@@ -116,10 +132,6 @@ public class EnrollmentServiceImpl implements EnrollmentService{
                 mentorStudent.setCreatedAt(LocalDateTime.now());
 
                 mentorStudentRepository.save(mentorStudent);
-            } else {
-                // Update existing enrollment if found
-                existingEnrollment.setPaymentStatus("Completed");
-                paymentRepository.save(existingEnrollment);
             }
             return true;
         }
