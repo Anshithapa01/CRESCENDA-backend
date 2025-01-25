@@ -56,7 +56,7 @@ public class StudentAuthController {
 	
 	@PostMapping("/signin")
 	public ResponseEntity<AuthResponse> loginUserHandler(@RequestBody LoginRequest login) throws UserException {
-	    try {
+	    try {	
 	        Authentication authentication = studentService.authenticate(login.getEmail(), login.getPassword());
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
 	        String token = jwtProvider.generateToken(authentication);
