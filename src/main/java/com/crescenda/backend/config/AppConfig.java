@@ -27,7 +27,7 @@ public class AppConfig {
 	    CorsConfiguration configuration = new CorsConfiguration();
 
 	    // Use allowedOriginPatterns for dynamic origin matching
-	    configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
+	    configuration.setAllowedOriginPatterns(Arrays.asList("https://crescenda.anshitha.cloud","https://www.crescenda.anshitha.cloud"));
 	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
 	    configuration.setExposedHeaders(Arrays.asList("Authorization"));
